@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1753155821485,
+      "tag": "0000_round_silverclaw",
+      "breakpoints": true
+    }
+  ]
+}
