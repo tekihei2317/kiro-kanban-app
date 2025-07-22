@@ -6,39 +6,62 @@ Trello風のカンバンタスク管理アプリケーションを、React + Typ
 
 ## アーキテクチャ
 
-### 技術スタック
+### 技術スタック（実装済み）
 
-- **フロントエンド**: React 18 + TypeScript + Vite
+- **フロントエンド**: React 19 + TypeScript + Vite 7
 - **バックエンド**: Cloudflare Workers
-- **API**: tRPC
+- **API**: tRPC 11.4.3
 - **データベース**: Cloudflare D1 (SQLite)
-- **ORM**: Drizzle ORM
-- **状態管理**: React Context API + useReducer
-- **ドラッグ&ドロップ**: @dnd-kit/core + @dnd-kit/sortable
-- **スタイリング**: Tailwind CSS
-- **開発ツール**: ESLint + Prettier
-- **テスト**: Vitest + React Testing Library
+- **ORM**: Drizzle ORM 0.44.3 + Drizzle Kit 0.31.4
+- **状態管理**: React Context API + useReducer（予定）
+- **ドラッグ&ドロップ**: @dnd-kit/core 6.3.1 + @dnd-kit/sortable 10.0.0
+- **スタイリング**: Tailwind CSS 4.1.11
+- **開発ツール**: ESLint 9.30.1 + Prettier + TypeScript 5.8.3
+- **テスト**: Vitest 3.2.4 + React Testing Library 16.3.0
+- **データフェッチング**: @tanstack/react-query 5.83.0
 
-### アーキテクチャパターン
+### アーキテクチャパターン（実装済み構造）
 
 ```
-src/
-├── components/          # 再利用可能なUIコンポーネント
-│   ├── ui/             # 基本UIコンポーネント（Button, Modal, Input等）
-│   ├── BoardCard.tsx   # ボードカード
-│   ├── BoardHeader.tsx # ボードヘッダー
-│   ├── List.tsx        # リスト
-│   ├── Card.tsx        # カード
-│   └── AddButton.tsx   # 追加ボタン
-├── contexts/           # React Context
-├── hooks/              # カスタムフック
-├── types/              # TypeScript型定義
-├── utils/              # ユーティリティ関数
-├── server/             # バックエンド（Cloudflare Workers）
-│   ├── api/            # tRPC API routes
-│   ├── db/             # Drizzle schema & migrations
-│   └── index.ts        # Workers entry point
-└── trpc/               # tRPC client setup
+プロジェクトルート/
+├── src/                    # フロントエンド（React）
+│   ├── assets/             # 静的アセット（実装済み）
+│   │   ├── Cloudflare_Logo.svg
+│   │   └── react.svg
+│   ├── components/         # 再利用可能なUIコンポーネント（予定）
+│   │   ├── ui/             # 基本UIコンポーネント（Button, Modal, Input等）
+│   │   ├── BoardCard.tsx   # ボードカード
+│   │   ├── BoardHeader.tsx # ボードヘッダー
+│   │   ├── List.tsx        # リスト
+│   │   ├── Card.tsx        # カード
+│   │   └── AddButton.tsx   # 追加ボタン
+│   ├── contexts/           # React Context（予定）
+│   ├── hooks/              # カスタムフック（予定）
+│   ├── types/              # TypeScript型定義（実装済み）
+│   │   └── index.ts        # 共通型定義
+│   ├── utils/              # ユーティリティ関数（予定）
+│   ├── test/               # テスト設定（実装済み）
+│   │   └── setup.ts        # Vitestセットアップ
+│   ├── trpc/               # tRPC client setup（予定）
+│   ├── App.tsx             # メインアプリケーションコンポーネント（実装済み）
+│   ├── main.tsx            # エントリーポイント（実装済み）
+│   └── index.css           # グローバルスタイル（Tailwind CSS）（実装済み）
+├── worker/                 # Cloudflare Workers（実装済み）
+│   ├── db/                 # データベース関連（実装済み）
+│   │   ├── index.ts        # データベース接続設定
+│   │   └── schema.ts       # Drizzleスキーマ定義
+│   └── index.ts            # Workers entry point & API endpoints
+├── migrations/             # データベースマイグレーション（実装済み）
+│   ├── 0000_round_silverclaw.sql
+│   └── meta/
+├── public/                 # 静的ファイル（実装済み）
+│   └── vite.svg
+├── drizzle.config.ts       # Drizzle設定（実装済み）
+├── wrangler.jsonc          # Cloudflare Workers設定（実装済み）
+├── vite.config.ts          # Vite設定（実装済み）
+├── vitest.config.ts        # テスト設定（実装済み）
+├── package.json            # 依存関係とスクリプト（実装済み）
+└── tsconfig.*.json         # TypeScript設定（実装済み）
 ```
 
 ## コンポーネントとインターフェース
@@ -120,12 +143,12 @@ type AppAction =
   | { type: 'REORDER_CARDS'; payload: { listId: string; cardIds: string[] } };
 ```
 
-### データ永続化
+### データ永続化（実装済み）
 
 Cloudflare D1データベースとDrizzle ORMを使用してデータを永続化します。
 
 ```typescript
-// Drizzle Schema
+// Drizzle Schema（実装済み - worker/db/schema.ts）
 export const boards = sqliteTable('boards', {
   id: text('id').primaryKey(),
   title: text('title').notNull(),
@@ -153,7 +176,26 @@ export const cards = sqliteTable('cards', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
 });
 
-// tRPC API
+// 型定義（実装済み）
+export type Board = typeof boards.$inferSelect;
+export type NewBoard = typeof boards.$inferInsert;
+export type List = typeof lists.$inferSelect;
+export type NewList = typeof lists.$inferInsert;
+export type Card = typeof cards.$inferSelect;
+export type NewCard = typeof cards.$inferInsert;
+
+// データベース接続（実装済み - worker/db/index.ts）
+export function createDb(d1: D1Database) {
+  return drizzle(d1, { schema });
+}
+
+// 現在のAPI実装（worker/index.ts）
+// - GET /api/health - データベース接続確認
+// - GET /api/boards/test - ボード作成・取得テスト
+// - GET /api/boards - ボード一覧取得
+// - POST /api/boards - ボード作成
+
+// tRPC API（次のタスクで実装予定）
 interface ApiService {
   boards: {
     getAll(): Promise<Board[]>;
@@ -276,6 +318,42 @@ React Error Boundaryを実装して、予期しないエラーをキャッチし
 - **タッチ操作**: タッチフレンドリーなUI要素
 - **水平スクロール**: モバイルでのリスト表示
 - **モーダル最適化**: モバイルでのカード詳細表示
+
+## 実装状況
+
+### 完了済み（タスク1-2）
+
+- ✅ **プロジェクト初期化とセットアップ**
+  - Cloudflare Reactテンプレートでプロジェクト作成
+  - 必要な依存関係のインストール
+  - TypeScript、ESLint、Prettierの設定
+  - TailwindCSS V4の設定
+  - Vitestテスト環境の設定
+
+- ✅ **データベーススキーマとマイグレーション**
+  - Drizzle ORMスキーマの定義（boards, lists, cards）
+  - D1データベースマイグレーションファイルの生成・適用
+  - データベース接続設定
+  - 基本的なAPIエンドポイントの実装
+  - データベース接続とCRUD操作の動作確認
+
+### 実装済みAPIエンドポイント
+
+```typescript
+// worker/index.ts で実装済み
+GET  /api/health        // データベース接続確認
+GET  /api/boards/test   // ボード作成・取得テスト
+GET  /api/boards        // ボード一覧取得
+POST /api/boards        // ボード作成
+```
+
+### 次の実装予定（タスク3以降）
+
+- tRPC APIルーターの実装
+- フロントエンドのtRPCクライアント設定
+- 基本UIコンポーネントの実装
+- 状態管理とContextの実装
+- ボード一覧画面の実装
 
 ## 将来の拡張性
 
