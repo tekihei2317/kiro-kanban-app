@@ -12,7 +12,7 @@
   - データベース接続とDrizzleクライアントの設定
   - _要件: 5.1, 5.2_
 
-- [ ] 3. tRPC APIルーターの実装
+- [x] 3. tRPC APIルーターの実装
   - tRPCサーバーの基本設定とCloudflare Workers統合
   - boards用のCRUD操作APIを実装（create, read, update, delete）
   - lists用のCRUD操作APIを実装（create, read, update, delete, reorder）

@@ -117,3 +117,15 @@ export interface UpdateCardInput {
   dueDate?: Date;
   position?: number;
 }
+
+// tRPC API types
+export interface MoveCardInput {
+  cardId: string;
+  newListId: string;
+  newPosition: number;
+}
+
+export interface ReorderListsInput {
+  boardId: string;
+  listIds: string[];
+}

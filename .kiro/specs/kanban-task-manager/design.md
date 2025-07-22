@@ -401,16 +401,41 @@ npm create cloudflare@latest -- my-react-app --framework=react
 }
 ```
 
-### 環境設定
+### 環境設定（実装済み）
 
-```toml
-# wrangler.toml
-name = "kanban-task-manager"
-main = "src/server/index.ts"
-compatibility_date = "2024-01-01"
+```jsonc
+// wrangler.jsonc
+{
+  "name": "kanban-task-manager",
+  "main": "worker/index.ts",
+  "compatibility_date": "2025-07-22",
+  "assets": {
+    "not_found_handling": "single-page-application"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "kanban-db",
+      "database_id": "your-database-id"
+    }
+  ]
+}
+```
 
-[[d1_databases]]
-binding = "DB"
-database_name = "kanban-db"
-database_id = "your-database-id"
+```typescript
+// drizzle.config.ts
+export default defineConfig({
+  schema: './worker/db/schema.ts',
+  out: './migrations',
+  dialect: 'sqlite',
+  driver: 'd1-http',
+  dbCredentials: {
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID!,
+    databaseId: process.env.CLOUDFLARE_DATABASE_ID!,
+    token: process.env.CLOUDFLARE_D1_TOKEN!,
+  },
+});
 ```
