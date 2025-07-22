@@ -15,6 +15,7 @@ export function TRPCProvider({ children }: TRPCProviderProps) {
         defaultOptions: {
           queries: {
             // エラー時の自動リトライを設定
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             retry: (failureCount, error: any) => {
               // 4xx エラーの場合はリトライしない
               if (error?.status >= 400 && error?.status < 500) {
@@ -30,6 +31,7 @@ export function TRPCProvider({ children }: TRPCProviderProps) {
           },
           mutations: {
             // ミューテーション失敗時のリトライ設定
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             retry: (failureCount, error: any) => {
               // 4xx エラーの場合はリトライしない
               if (error?.status >= 400 && error?.status < 500) {
