@@ -4,6 +4,7 @@ import { mockAppState } from './data/mockData';
 import { BoardList } from './components/BoardList';
 import { BoardView } from './components/BoardView';
 import { CardDetailModal } from './components/CardDetailModal';
+import { TRPCProvider } from './providers/TRPCProvider';
 
 function App() {
   const [appState, setAppState] = useState<AppState>(mockAppState);
@@ -109,36 +110,38 @@ function App() {
     : null;
 
   return (
-    <div className="App">
-      {!currentBoard ? (
-        <BoardList
-          boards={appState.boards}
-          onBoardSelect={handleBoardSelect}
-          onBoardCreate={handleBoardCreate}
-        />
-      ) : (
-        <BoardView
-          board={currentBoard}
-          lists={appState.lists}
-          cards={appState.cards}
-          onBack={handleBackToBoards}
-          onListCreate={handleListCreate}
-          onCardCreate={handleCardCreate}
-          onCardClick={handleCardClick}
-        />
-      )}
+    <TRPCProvider>
+      <div className="App">
+        {!currentBoard ? (
+          <BoardList
+            boards={appState.boards}
+            onBoardSelect={handleBoardSelect}
+            onBoardCreate={handleBoardCreate}
+          />
+        ) : (
+          <BoardView
+            board={currentBoard}
+            lists={appState.lists}
+            cards={appState.cards}
+            onBack={handleBackToBoards}
+            onListCreate={handleListCreate}
+            onCardCreate={handleCardCreate}
+            onCardClick={handleCardClick}
+          />
+        )}
 
-      <CardDetailModal
-        card={selectedCard}
-        isOpen={isCardModalOpen}
-        onClose={() => {
-          setIsCardModalOpen(false);
-          setSelectedCard(null);
-        }}
-        onSave={handleCardSave}
-        onDelete={handleCardDelete}
-      />
-    </div>
+        <CardDetailModal
+          card={selectedCard}
+          isOpen={isCardModalOpen}
+          onClose={() => {
+            setIsCardModalOpen(false);
+            setSelectedCard(null);
+          }}
+          onSave={handleCardSave}
+          onDelete={handleCardDelete}
+        />
+      </div>
+    </TRPCProvider>
   );
 }
 

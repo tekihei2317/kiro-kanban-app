@@ -6,4 +6,5 @@ export function createDB(d1: D1Database) {
 }
 
 export type DB = ReturnType<typeof createDB>;
+
 export { schema };
