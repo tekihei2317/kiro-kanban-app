@@ -14,7 +14,9 @@ interface ListProps {
 }
 
 export function List({ list, onCardClick }: ListProps) {
-  const { data: cards = [] } = trpc.cards.getByListId.useQuery({ listId: list.id });
+  const { data: cards = [] } = trpc.cards.getByListId.useQuery({
+    listId: list.id,
+  });
   const { createCard } = useTRPCMutations();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState('');

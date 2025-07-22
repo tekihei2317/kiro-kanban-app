@@ -75,20 +75,22 @@ export const listsRouter = router({
     }),
 
   // Delete list
-  delete: publicProcedure.input(z.object({ id: z.string() })).mutation(async ({ input, ctx }) => {
-    const db = createDB(ctx.env.DB);
+  delete: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = createDB(ctx.env.DB);
 
-    const result = await db
-      .delete(schema.lists)
-      .where(eq(schema.lists.id, input.id))
-      .returning();
+      const result = await db
+        .delete(schema.lists)
+        .where(eq(schema.lists.id, input.id))
+        .returning();
 
-    if (result.length === 0) {
-      throw new Error('List not found');
-    }
+      if (result.length === 0) {
+        throw new Error('List not found');
+      }
 
-    return { success: true };
-  }),
+      return { success: true };
+    }),
 
   // Reorder lists
   reorder: publicProcedure

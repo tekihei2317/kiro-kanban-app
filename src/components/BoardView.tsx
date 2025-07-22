@@ -93,7 +93,7 @@ export function BoardView({ boardId, onBack, onCardClick }: BoardViewProps) {
             >
               ← 戻る
             </Button>
-            
+
             {/* ボードタイトル */}
             {isEditingBoardTitle ? (
               <div className="flex items-center space-x-2">
@@ -104,7 +104,11 @@ export function BoardView({ boardId, onBack, onCardClick }: BoardViewProps) {
                   className="text-2xl font-bold"
                   autoFocus
                 />
-                <Button variant="secondary" size="sm" onClick={handleBoardTitleCancel}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleBoardTitleCancel}
+                >
                   キャンセル
                 </Button>
                 <Button size="sm" onClick={handleBoardTitleSave}>
@@ -112,7 +116,7 @@ export function BoardView({ boardId, onBack, onCardClick }: BoardViewProps) {
                 </Button>
               </div>
             ) : (
-              <h1 
+              <h1
                 className="text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
                 onClick={startEditingBoardTitle}
                 title="クリックして編集"

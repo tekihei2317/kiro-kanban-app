@@ -40,20 +40,22 @@ export const cardsRouter = router({
     }),
 
   // Get card by ID
-  getById: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
-    const db = createDB(ctx.env.DB);
-    const card = await db
-      .select()
-      .from(schema.cards)
-      .where(eq(schema.cards.id, input.id))
-      .limit(1);
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const db = createDB(ctx.env.DB);
+      const card = await db
+        .select()
+        .from(schema.cards)
+        .where(eq(schema.cards.id, input.id))
+        .limit(1);
 
-    if (card.length === 0) {
-      throw new Error('Card not found');
-    }
+      if (card.length === 0) {
+        throw new Error('Card not found');
+      }
 
-    return card[0];
-  }),
+      return card[0];
+    }),
 
   // Create card
   create: publicProcedure
@@ -98,20 +100,22 @@ export const cardsRouter = router({
     }),
 
   // Delete card
-  delete: publicProcedure.input(z.object({ id: z.string() })).mutation(async ({ input, ctx }) => {
-    const db = createDB(ctx.env.DB);
+  delete: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = createDB(ctx.env.DB);
 
-    const result = await db
-      .delete(schema.cards)
-      .where(eq(schema.cards.id, input.id))
-      .returning();
+      const result = await db
+        .delete(schema.cards)
+        .where(eq(schema.cards.id, input.id))
+        .returning();
 
-    if (result.length === 0) {
-      throw new Error('Card not found');
-    }
+      if (result.length === 0) {
+        throw new Error('Card not found');
+      }
 
-    return { success: true };
-  }),
+      return { success: true };
+    }),
 
   // Move card to different list or position
   move: publicProcedure

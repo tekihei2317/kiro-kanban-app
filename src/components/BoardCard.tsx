@@ -79,7 +79,11 @@ export function BoardCard({ board, onClick }: BoardCardProps) {
                 autoFocus
               />
               <div className="flex justify-end space-x-2">
-                <Button variant="secondary" size="sm" onClick={handleTitleCancel}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleTitleCancel}
+                >
                   キャンセル
                 </Button>
                 <Button size="sm" onClick={handleTitleSave}>

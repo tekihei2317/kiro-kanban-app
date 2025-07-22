@@ -20,7 +20,6 @@ function App() {
     setCurrentBoardId(null);
   };
 
-
   // カードクリック
   const handleCardClick = (card: Card) => {
     setSelectedCard(card);
