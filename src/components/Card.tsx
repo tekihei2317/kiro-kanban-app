@@ -6,11 +6,12 @@ interface CardProps {
 }
 
 export function Card({ card, onClick }: CardProps) {
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
     return new Intl.DateTimeFormat('ja-JP', {
       month: 'short',
       day: 'numeric',
-    }).format(date);
+    }).format(dateObj);
   };
 
   const isOverdue = card.dueDate && new Date(card.dueDate) < new Date();

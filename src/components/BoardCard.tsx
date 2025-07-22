@@ -6,12 +6,13 @@ interface BoardCardProps {
 }
 
 export function BoardCard({ board, onClick }: BoardCardProps) {
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
     return new Intl.DateTimeFormat('ja-JP', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
-    }).format(date);
+    }).format(dateObj);
   };
 
   return (

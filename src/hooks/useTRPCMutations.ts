@@ -67,7 +67,7 @@ export function useTRPCMutations() {
 
         // 関連するキャッシュを無効化
         await utils.boards.getAll.invalidate();
-        await utils.boards.getById.invalidate(input.id);
+        await utils.boards.getById.invalidate({ id: input.id });
 
         stopLoading(key);
         return result;
@@ -87,7 +87,7 @@ export function useTRPCMutations() {
       const key = 'deleteBoard';
       try {
         startLoading(key);
-        await deleteBoardMutation.mutateAsync(id);
+        await deleteBoardMutation.mutateAsync({ id });
 
         // キャッシュを無効化
         await utils.boards.getAll.invalidate();
@@ -118,7 +118,7 @@ export function useTRPCMutations() {
         const result = await createListMutation.mutateAsync(input);
 
         // 関連するキャッシュを無効化
-        await utils.lists.getByBoardId.invalidate(input.boardId);
+        await utils.lists.getByBoardId.invalidate({ boardId: input.boardId });
 
         stopLoading(key);
         return result;
@@ -176,7 +176,7 @@ export function useTRPCMutations() {
       const key = 'deleteList';
       try {
         startLoading(key);
-        await deleteListMutation.mutateAsync(id);
+        await deleteListMutation.mutateAsync({ id });
 
         // 関連するキャッシュを無効化
         await utils.lists.getByBoardId.invalidate();
@@ -215,7 +215,7 @@ export function useTRPCMutations() {
         const result = await createCardMutation.mutateAsync(input);
 
         // 関連するキャッシュを無効化
-        await utils.cards.getByListId.invalidate(input.listId);
+        await utils.cards.getByListId.invalidate({ listId: input.listId });
 
         stopLoading(key);
         return result;
@@ -284,7 +284,7 @@ export function useTRPCMutations() {
       const key = 'deleteCard';
       try {
         startLoading(key);
-        await deleteCardMutation.mutateAsync(id);
+        await deleteCardMutation.mutateAsync({ id });
 
         // 関連するキャッシュを無効化
         await utils.cards.getByListId.invalidate();

@@ -2,8 +2,8 @@
 export interface Board {
   id: string;
   title: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface NewBoard {
@@ -18,8 +18,8 @@ export interface List {
   boardId: string;
   title: string;
   position: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface NewList {
@@ -36,10 +36,10 @@ export interface Card {
   listId: string;
   title: string;
   description?: string | null;
-  dueDate?: Date | null;
+  dueDate?: Date | string | null;
   position: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface NewCard {

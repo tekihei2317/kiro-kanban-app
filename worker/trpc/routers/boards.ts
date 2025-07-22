@@ -24,12 +24,12 @@ export const boardsRouter = router({
   }),
 
   // Get board by ID
-  getById: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+  getById: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
     const db = createDB(ctx.env.DB);
     const board = await db
       .select()
       .from(schema.boards)
-      .where(eq(schema.boards.id, input))
+      .where(eq(schema.boards.id, input.id))
       .limit(1);
 
     if (board.length === 0) {
@@ -78,12 +78,12 @@ export const boardsRouter = router({
     }),
 
   // Delete board
-  delete: publicProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+  delete: publicProcedure.input(z.object({ id: z.string() })).mutation(async ({ input, ctx }) => {
     const db = createDB(ctx.env.DB);
 
     const result = await db
       .delete(schema.boards)
-      .where(eq(schema.boards.id, input))
+      .where(eq(schema.boards.id, input.id))
       .returning();
 
     if (result.length === 0) {

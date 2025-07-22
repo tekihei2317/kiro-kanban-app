@@ -28,24 +28,24 @@ const moveCardSchema = z.object({
 export const cardsRouter = router({
   // Get cards by list ID
   getByListId: publicProcedure
-    .input(z.string())
+    .input(z.object({ listId: z.string() }))
     .query(async ({ input, ctx }) => {
       const db = createDB(ctx.env.DB);
       const cards = await db
         .select()
         .from(schema.cards)
-        .where(eq(schema.cards.listId, input))
+        .where(eq(schema.cards.listId, input.listId))
         .orderBy(asc(schema.cards.position));
       return cards;
     }),
 
   // Get card by ID
-  getById: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
+  getById: publicProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
     const db = createDB(ctx.env.DB);
     const card = await db
       .select()
       .from(schema.cards)
-      .where(eq(schema.cards.id, input))
+      .where(eq(schema.cards.id, input.id))
       .limit(1);
 
     if (card.length === 0) {
@@ -98,12 +98,12 @@ export const cardsRouter = router({
     }),
 
   // Delete card
-  delete: publicProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+  delete: publicProcedure.input(z.object({ id: z.string() })).mutation(async ({ input, ctx }) => {
     const db = createDB(ctx.env.DB);
 
     const result = await db
       .delete(schema.cards)
-      .where(eq(schema.cards.id, input))
+      .where(eq(schema.cards.id, input.id))
       .returning();
 
     if (result.length === 0) {

@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { trpc } from '../lib/trpc';
+import { useTRPCMutations } from '../hooks/useTRPCMutations';
 import type { List as ListType, Card as CardType } from '../types';
 import { Card } from './Card';
 import { AddButton } from './AddButton';
@@ -8,18 +10,22 @@ import { Button } from './ui/Button';
 
 interface ListProps {
   list: ListType;
-  cards: CardType[];
-  onCardCreate: (listId: string, title: string) => void;
   onCardClick: (card: CardType) => void;
 }
 
-export function List({ list, cards, onCardCreate, onCardClick }: ListProps) {
+export function List({ list, onCardClick }: ListProps) {
+  const { data: cards = [] } = trpc.cards.getByListId.useQuery({ listId: list.id });
+  const { createCard } = useTRPCMutations();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newCardTitle, setNewCardTitle] = useState('');
 
-  const handleCreateCard = () => {
+  const handleCreateCard = async () => {
     if (newCardTitle.trim()) {
-      onCardCreate(list.id, newCardTitle.trim());
+      await createCard({
+        listId: list.id,
+        title: newCardTitle.trim(),
+        position: cards.length,
+      });
       setNewCardTitle('');
       setIsCreateModalOpen(false);
     }
@@ -31,7 +37,7 @@ export function List({ list, cards, onCardCreate, onCardClick }: ListProps) {
     }
   };
 
-  // リストのカードを位置順にソート
+  // カードを位置順にソート
   const sortedCards = [...cards].sort((a, b) => a.position - b.position);
 
   return (

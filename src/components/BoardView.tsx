@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import type { Board, List as ListType, Card as CardType } from '../types';
+import { trpc } from '../lib/trpc';
+import { useTRPCMutations } from '../hooks/useTRPCMutations';
+import type { Card as CardType } from '../types';
 import { List } from './List';
 import { AddButton } from './AddButton';
 import { Modal } from './ui/Modal';
@@ -7,30 +9,25 @@ import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 
 interface BoardViewProps {
-  board: Board;
-  lists: ListType[];
-  cards: CardType[];
+  boardId: string;
   onBack: () => void;
-  onListCreate: (boardId: string, title: string) => void;
-  onCardCreate: (listId: string, title: string) => void;
   onCardClick: (card: CardType) => void;
 }
 
-export function BoardView({
-  board,
-  lists,
-  cards,
-  onBack,
-  onListCreate,
-  onCardCreate,
-  onCardClick,
-}: BoardViewProps) {
+export function BoardView({ boardId, onBack, onCardClick }: BoardViewProps) {
+  const { data: board } = trpc.boards.getById.useQuery({ id: boardId });
+  const { data: lists = [] } = trpc.lists.getByBoardId.useQuery({ boardId });
+  const { createList } = useTRPCMutations();
   const [isCreateListModalOpen, setIsCreateListModalOpen] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
 
-  const handleCreateList = () => {
+  const handleCreateList = async () => {
     if (newListTitle.trim()) {
-      onListCreate(board.id, newListTitle.trim());
+      await createList({
+        boardId,
+        title: newListTitle.trim(),
+        position: lists.length,
+      });
       setNewListTitle('');
       setIsCreateListModalOpen(false);
     }
@@ -42,10 +39,16 @@ export function BoardView({
     }
   };
 
-  // ボードのリストを位置順にソート
-  const sortedLists = [...lists]
-    .filter((list) => list.boardId === board.id)
-    .sort((a, b) => a.position - b.position);
+  // リストを位置順にソート
+  const sortedLists = [...lists].sort((a, b) => a.position - b.position);
+
+  if (!board) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-500">読み込み中...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,18 +72,9 @@ export function BoardView({
       <div className="p-4">
         <div className="flex space-x-4 overflow-x-auto pb-4">
           {/* リスト一覧 */}
-          {sortedLists.map((list) => {
-            const listCards = cards.filter((card) => card.listId === list.id);
-            return (
-              <List
-                key={list.id}
-                list={list}
-                cards={listCards}
-                onCardCreate={onCardCreate}
-                onCardClick={onCardClick}
-              />
-            );
-          })}
+          {sortedLists.map((list) => (
+            <List key={list.id} list={list} onCardClick={onCardClick} />
+          ))}
 
           {/* リスト追加ボタン */}
           <div className="bg-gray-200 rounded-lg p-3 w-72 flex-shrink-0">

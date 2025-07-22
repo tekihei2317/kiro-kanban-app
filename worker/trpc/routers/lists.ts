@@ -23,13 +23,13 @@ const reorderListsSchema = z.object({
 export const listsRouter = router({
   // Get lists by board ID
   getByBoardId: publicProcedure
-    .input(z.string())
+    .input(z.object({ boardId: z.string() }))
     .query(async ({ input, ctx }) => {
       const db = createDB(ctx.env.DB);
       const lists = await db
         .select()
         .from(schema.lists)
-        .where(eq(schema.lists.boardId, input))
+        .where(eq(schema.lists.boardId, input.boardId))
         .orderBy(asc(schema.lists.position));
       return lists;
     }),
@@ -75,12 +75,12 @@ export const listsRouter = router({
     }),
 
   // Delete list
-  delete: publicProcedure.input(z.string()).mutation(async ({ input, ctx }) => {
+  delete: publicProcedure.input(z.object({ id: z.string() })).mutation(async ({ input, ctx }) => {
     const db = createDB(ctx.env.DB);
 
     const result = await db
       .delete(schema.lists)
-      .where(eq(schema.lists.id, input))
+      .where(eq(schema.lists.id, input.id))
       .returning();
 
     if (result.length === 0) {
