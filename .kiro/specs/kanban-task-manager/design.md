@@ -126,7 +126,7 @@ interface AppState {
 React Context + useReducerパターンを使用して、アプリケーション全体の状態を管理します。
 
 ```typescript
-type AppAction = 
+type AppAction =
   | { type: 'SET_BOARDS'; payload: Board[] }
   | { type: 'ADD_BOARD'; payload: Board }
   | { type: 'UPDATE_BOARD'; payload: { id: string; updates: Partial<Board> } }
@@ -139,7 +139,10 @@ type AppAction =
   | { type: 'ADD_CARD'; payload: Card }
   | { type: 'UPDATE_CARD'; payload: { id: string; updates: Partial<Card> } }
   | { type: 'DELETE_CARD'; payload: string }
-  | { type: 'MOVE_CARD'; payload: { cardId: string; newListId: string; newPosition: number } }
+  | {
+      type: 'MOVE_CARD';
+      payload: { cardId: string; newListId: string; newPosition: number };
+    }
   | { type: 'REORDER_CARDS'; payload: { listId: string; cardIds: string[] } };
 ```
 
@@ -158,7 +161,9 @@ export const boards = sqliteTable('boards', {
 
 export const lists = sqliteTable('lists', {
   id: text('id').primaryKey(),
-  boardId: text('board_id').notNull().references(() => boards.id, { onDelete: 'cascade' }),
+  boardId: text('board_id')
+    .notNull()
+    .references(() => boards.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
   position: integer('position').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
@@ -167,7 +172,9 @@ export const lists = sqliteTable('lists', {
 
 export const cards = sqliteTable('cards', {
   id: text('id').primaryKey(),
-  listId: text('list_id').notNull().references(() => lists.id, { onDelete: 'cascade' }),
+  listId: text('list_id')
+    .notNull()
+    .references(() => lists.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
   description: text('description'),
   dueDate: integer('due_date', { mode: 'timestamp' }),
@@ -310,7 +317,7 @@ React Error Boundaryを実装して、予期しないエラーをキャッチし
 ### ブレークポイント
 
 - **モバイル**: < 768px
-- **タブレット**: 768px - 1024px  
+- **タブレット**: 768px - 1024px
 - **デスクトップ**: > 1024px
 
 ### モバイル最適化
@@ -341,10 +348,10 @@ React Error Boundaryを実装して、予期しないエラーをキャッチし
 
 ```typescript
 // worker/index.ts で実装済み
-GET  /api/health        // データベース接続確認
-GET  /api/boards/test   // ボード作成・取得テスト
-GET  /api/boards        // ボード一覧取得
-POST /api/boards        // ボード作成
+GET / api / health; // データベース接続確認
+GET / api / boards / test; // ボード作成・取得テスト
+GET / api / boards; // ボード一覧取得
+POST / api / boards; // ボード作成
 ```
 
 ### 次の実装予定（タスク3以降）
@@ -369,7 +376,9 @@ POST /api/boards        // ボード作成
 - **添付ファイル**: ファイルアップロード機能
 - **コメント**: カードへのコメント機能
 - **通知**: タスクの期限通知
+
 ## プ
+
 ロジェクト初期化
 
 ### Cloudflare Reactテンプレート
@@ -410,18 +419,18 @@ npm create cloudflare@latest -- my-react-app --framework=react
   "main": "worker/index.ts",
   "compatibility_date": "2025-07-22",
   "assets": {
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "kanban-db",
-      "database_id": "your-database-id"
-    }
-  ]
+      "database_id": "your-database-id",
+    },
+  ],
 }
 ```
 

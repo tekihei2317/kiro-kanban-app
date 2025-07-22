@@ -8,18 +8,18 @@
   "main": "worker/index.ts",
   "compatibility_date": "2025-07-22",
   "assets": {
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "kanban-db",
-      "database_id": "17d9b2c8-b592-4efc-8cbd-3c0baec2d91b"
-    }
-  ]
+      "database_id": "17d9b2c8-b592-4efc-8cbd-3c0baec2d91b",
+    },
+  ],
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
