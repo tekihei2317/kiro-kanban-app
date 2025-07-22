@@ -17,9 +17,11 @@ interface BoardViewProps {
 export function BoardView({ boardId, onBack, onCardClick }: BoardViewProps) {
   const { data: board } = trpc.boards.getById.useQuery({ id: boardId });
   const { data: lists = [] } = trpc.lists.getByBoardId.useQuery({ boardId });
-  const { createList } = useTRPCMutations();
+  const { createList, updateBoard } = useTRPCMutations();
   const [isCreateListModalOpen, setIsCreateListModalOpen] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
+  const [isEditingBoardTitle, setIsEditingBoardTitle] = useState(false);
+  const [editBoardTitle, setEditBoardTitle] = useState('');
 
   const handleCreateList = async () => {
     if (newListTitle.trim()) {
@@ -37,6 +39,34 @@ export function BoardView({ boardId, onBack, onCardClick }: BoardViewProps) {
     if (e.key === 'Enter') {
       handleCreateList();
     }
+  };
+
+  const handleBoardTitleSave = async () => {
+    if (editBoardTitle.trim() && editBoardTitle.trim() !== board?.title) {
+      await updateBoard({
+        id: boardId,
+        title: editBoardTitle.trim(),
+      });
+    }
+    setIsEditingBoardTitle(false);
+  };
+
+  const handleBoardTitleCancel = () => {
+    setEditBoardTitle(board?.title || '');
+    setIsEditingBoardTitle(false);
+  };
+
+  const handleBoardTitleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleBoardTitleSave();
+    } else if (e.key === 'Escape') {
+      handleBoardTitleCancel();
+    }
+  };
+
+  const startEditingBoardTitle = () => {
+    setEditBoardTitle(board?.title || '');
+    setIsEditingBoardTitle(true);
   };
 
   // リストを位置順にソート
@@ -63,7 +93,33 @@ export function BoardView({ boardId, onBack, onCardClick }: BoardViewProps) {
             >
               ← 戻る
             </Button>
-            <h1 className="text-2xl font-bold text-gray-900">{board.title}</h1>
+            
+            {/* ボードタイトル */}
+            {isEditingBoardTitle ? (
+              <div className="flex items-center space-x-2">
+                <Input
+                  value={editBoardTitle}
+                  onChange={(e) => setEditBoardTitle(e.target.value)}
+                  onKeyDown={handleBoardTitleKeyPress}
+                  className="text-2xl font-bold"
+                  autoFocus
+                />
+                <Button variant="secondary" size="sm" onClick={handleBoardTitleCancel}>
+                  キャンセル
+                </Button>
+                <Button size="sm" onClick={handleBoardTitleSave}>
+                  保存
+                </Button>
+              </div>
+            ) : (
+              <h1 
+                className="text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                onClick={startEditingBoardTitle}
+                title="クリックして編集"
+              >
+                {board.title}
+              </h1>
+            )}
           </div>
         </div>
       </header>
